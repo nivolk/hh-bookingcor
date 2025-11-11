@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Modules\Hunting\Application\DTO;
 
 use DateTimeImmutable;
-use Exception;
 use InvalidArgumentException;
+use Modules\Hunting\Domain\Exceptions\ParticipantsLimitExceeded;
 
 final readonly class CreateBookingDTO
 {
@@ -18,7 +18,7 @@ final readonly class CreateBookingDTO
         public int $participantsCount
     ) {
         if ($this->participantsCount < 1 || $this->participantsCount > 10) {
-            throw new InvalidArgumentException('participants_count must be between 1 and 10');
+            throw new ParticipantsLimitExceeded($this->participantsCount);
         }
     }
 

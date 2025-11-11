@@ -155,9 +155,9 @@ final class HuntingApiTest extends TestCase
         $response = $this->postJson('/api/bookings', $payload);
 
         $response
-            ->assertStatus(409)
+            ->assertStatus(422)
             ->assertJsonFragment([
-                'message' => 'Guide is inactive or not found',
+                'message' => 'Guide is inactive',
             ]);
 
         $this->assertDatabaseMissing('hunting_bookings', [

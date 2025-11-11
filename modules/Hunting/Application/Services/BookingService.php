@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Hunting\Application\Services;
 
-use DomainException;
 use Illuminate\Support\Facades\DB;
 use Modules\Hunting\Application\DTO\CreateBookingDTO;
 use Modules\Hunting\Domain\Entities\Guide;
 use Modules\Hunting\Domain\Entities\HuntingBooking;
+use Modules\Hunting\Domain\Exceptions\GuideAlreadyBooked;
+use Modules\Hunting\Domain\Exceptions\GuideInactive;
+use Modules\Hunting\Domain\Exceptions\GuideNotFound;
 use Modules\Hunting\Domain\Repositories\BookingRepositoryInterface;
 use Modules\Hunting\Domain\Repositories\GuideRepositoryInterface;
 use Throwable;
@@ -22,7 +24,8 @@ final readonly class BookingService
     }
 
     /**
-     * @throws DomainException
+     * @param CreateBookingDTO $dto
+     * @return HuntingBooking
      * @throws Throwable
      */
     public function create(CreateBookingDTO $dto): HuntingBooking
@@ -31,12 +34,15 @@ final readonly class BookingService
             /** @var Guide|null $guide */
             $guide = $this->guideRepository->getById($dto->guideId);
 
-            if (!$guide || !$guide->is_active) {
-                throw new DomainException('Guide is inactive or not found');
+            if (!$guide) {
+                throw new GuideNotFound();
+            }
+            if (!$guide->is_active) {
+                throw new GuideInactive();
             }
 
             if ($this->bookingRepository->existsForGuideOnDate($dto->guideId, $dto->date)) {
-                throw new DomainException('Guide already has a booking on this date');
+                throw new GuideAlreadyBooked();
             }
 
             return $this->bookingRepository->create([

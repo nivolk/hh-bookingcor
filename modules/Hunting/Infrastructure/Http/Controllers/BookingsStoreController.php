@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Modules\Hunting\Infrastructure\Http\Controllers;
 
-use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use InvalidArgumentException;
 use Modules\Hunting\Application\DTO\CreateBookingDTO;
 use Modules\Hunting\Application\Services\BookingService;
+use Modules\Hunting\Domain\Exceptions\GuideAlreadyBooked;
+use Modules\Hunting\Domain\Exceptions\GuideInactive;
+use Modules\Hunting\Domain\Exceptions\GuideNotFound;
+use Modules\Hunting\Domain\Exceptions\ParticipantsLimitExceeded;
 use Modules\Hunting\Infrastructure\Http\Requests\CreateBookingRequest;
 use Modules\Hunting\Infrastructure\Http\Resources\BookingResource;
 
@@ -34,13 +37,18 @@ final class BookingsStoreController extends Controller
      *     @OA\JsonContent(ref="#/components/schemas/BookingResponse")
      *   ),
      *   @OA\Response(
+     *     response=404,
+     *     description="Гид не найден",
+     *     @OA\JsonContent(ref="#/components/schemas/SimpleError")
+     *   ),
+     *   @OA\Response(
      *     response=409,
      *     description="Конфликт: у гида уже есть бронирование на эту дату",
      *     @OA\JsonContent(ref="#/components/schemas/SimpleError")
      *   ),
      *   @OA\Response(
      *     response=422,
-     *     description="Ошибка валидации или неверный формат входных данных",
+     *     description="Ошибка валидации или неверный формат входных данных / гид неактивен",
      *     @OA\JsonContent(
      *       oneOf={
      *         @OA\Schema(ref="#/components/schemas/ValidationError"),
@@ -59,9 +67,11 @@ final class BookingsStoreController extends Controller
             return (new BookingResource($created))
                 ->response()
                 ->setStatusCode(201);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException|ParticipantsLimitExceeded|GuideInactive $e) {
             return response()->json(['message' => $e->getMessage()], 422);
-        } catch (DomainException $e) {
+        } catch (GuideNotFound $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (GuideAlreadyBooked $e) {
             return response()->json(['message' => $e->getMessage()], 409);
         }
     }
