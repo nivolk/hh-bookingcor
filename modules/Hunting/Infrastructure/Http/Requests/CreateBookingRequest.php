@@ -19,7 +19,7 @@ final class CreateBookingRequest extends FormRequest
             'tour_name' => ['required', 'string', 'max:255'],
             'hunter_name' => ['required', 'string', 'max:255'],
             'guide_id' => ['required', 'integer', 'exists:guides,id'],
-            'date' => ['required', 'date'],
+            'date' => ['required', 'date:Y-m-d'],
             'participants_count' => ['required', 'integer', 'min:1', 'max:10'],
         ];
     }
