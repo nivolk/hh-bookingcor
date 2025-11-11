@@ -17,6 +17,25 @@ final class GuidesIndexController extends Controller
     ) {
     }
 
+    /**
+     * @OA\Get(
+     *   path="/guides",
+     *   tags={"Guides"},
+     *   summary="Список активных гидов",
+     *   @OA\Parameter(
+     *     name="min_experience",
+     *     in="query",
+     *     description="Минимальный стаж (лет)",
+     *     required=false,
+     *     @OA\Schema(type="integer", minimum=0, example=3)
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(ref="#/components/schemas/GuidesResponse")
+     *   )
+     * )
+     */
     public function __invoke(ListGuidesRequest $request): AnonymousResourceCollection
     {
         $minExperience = (int)$request->input('min_experience');

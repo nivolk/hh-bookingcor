@@ -1,0 +1,319 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "BookingCore",
+        "description": "Модуль охотничьих туров",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API base path"
+        }
+    ],
+    "paths": {
+        "/bookings": {
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Создать бронирование охотничьего тура",
+                "operationId": "7b11f9e74f068ea681f4067fe9da09ce",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateBookingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Конфликт: у гида уже есть бронирование на эту дату",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации или неверный формат входных данных",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ValidationError"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/SimpleError"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/guides": {
+            "get": {
+                "tags": [
+                    "Guides"
+                ],
+                "summary": "Список активных гидов",
+                "operationId": "847112d7a065ac8d6854f267208d59e5",
+                "parameters": [
+                    {
+                        "name": "min_experience",
+                        "in": "query",
+                        "description": "Минимальный стаж (лет)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GuidesResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Guide": {
+                "required": [
+                    "id",
+                    "name",
+                    "experience_years"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Иван Иванов"
+                    },
+                    "experience_years": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 5
+                    }
+                },
+                "type": "object"
+            },
+            "Booking": {
+                "required": [
+                    "id",
+                    "tour_name",
+                    "hunter_name",
+                    "guide_id",
+                    "date",
+                    "participants_count"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 10
+                    },
+                    "tour_name": {
+                        "type": "string",
+                        "example": "Охота на комаров"
+                    },
+                    "hunter_name": {
+                        "type": "string",
+                        "example": "Олег"
+                    },
+                    "guide_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-01-10"
+                    },
+                    "participants_count": {
+                        "type": "integer",
+                        "maximum": 10,
+                        "minimum": 1,
+                        "example": 3
+                    }
+                },
+                "type": "object"
+            },
+            "CreateBookingRequest": {
+                "required": [
+                    "tour_name",
+                    "hunter_name",
+                    "guide_id",
+                    "date",
+                    "participants_count"
+                ],
+                "properties": {
+                    "tour_name": {
+                        "type": "string",
+                        "example": "Охота на комаров"
+                    },
+                    "hunter_name": {
+                        "type": "string",
+                        "example": "Олег"
+                    },
+                    "guide_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-01-10"
+                    },
+                    "participants_count": {
+                        "type": "integer",
+                        "maximum": 10,
+                        "minimum": 1,
+                        "example": 3
+                    }
+                },
+                "type": "object"
+            },
+            "GuidesResponse": {
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Guide"
+                        }
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "data": [
+                        {
+                            "id": 6,
+                            "name": "Василий Васильев",
+                            "experience_years": 4
+                        },
+                        {
+                            "id": 1,
+                            "name": "Иван Иванов",
+                            "experience_years": 5
+                        }
+                    ]
+                }
+            },
+            "BookingResponse": {
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/Booking"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "data": {
+                        "id": 10,
+                        "tour_name": "Охота на санту",
+                        "hunter_name": "Губка боб",
+                        "guide_id": 1,
+                        "date": "2025-12-31",
+                        "participants_count": 3
+                    }
+                }
+            },
+            "ValidationError": {
+                "required": [
+                    "message",
+                    "errors"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "date": [
+                                "The date field must be a valid date."
+                            ]
+                        },
+                        "additionalProperties": {
+                            "schema": "Schemas",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Schemas": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "SimpleError": {
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Guide already has a booking on this date"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Guides",
+            "description": "Справочник активных гидов"
+        },
+        {
+            "name": "Bookings",
+            "description": "Бронирования охотничьих туров"
+        }
+    ]
+}
