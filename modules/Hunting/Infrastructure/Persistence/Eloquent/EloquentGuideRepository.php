@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Hunting\Infrastructure\Persistence\Eloquent;
 
-use Illuminate\Support\Collection;
+use Modules\Hunting\Domain\Collections\GuideCollection;
 use Modules\Hunting\Domain\Entities\Guide;
 use Modules\Hunting\Domain\Repositories\GuideRepositoryInterface;
 
@@ -16,7 +16,7 @@ final class EloquentGuideRepository implements GuideRepositoryInterface
         return Guide::query()->whereKey($id)->first();
     }
 
-    public function listActive(?int $minExperience = null): Collection
+    public function listActive(?int $minExperience = null): GuideCollection
     {
         $q = Guide::query()->active()->orderBy('name');
 
@@ -24,6 +24,8 @@ final class EloquentGuideRepository implements GuideRepositoryInterface
             $q->minExperience($minExperience);
         }
 
-        return $q->get();
+        $eloquent = $q->get();
+
+        return GuideCollection::from($eloquent->all());
     }
 }

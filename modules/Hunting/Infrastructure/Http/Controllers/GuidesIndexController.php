@@ -22,6 +22,6 @@ final class GuidesIndexController extends Controller
         $minExperience = (int)$request->input('min_experience');
         $list = $this->guides->listActive($minExperience);
 
-        return GuideResource::collection($list);
+        return GuideResource::collection($list->all());
     }
 }
