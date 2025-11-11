@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Hunting\Application\Services;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
 use Modules\Hunting\Application\DTO\CreateBookingDTO;
 use Modules\Hunting\Domain\Entities\Guide;
 use Modules\Hunting\Domain\Entities\HuntingBooking;
@@ -20,6 +20,7 @@ final readonly class BookingService
     public function __construct(
         private BookingRepositoryInterface $bookingRepository,
         private GuideRepositoryInterface $guideRepository,
+        private DatabaseManager $db,
     ) {
     }
 
@@ -30,7 +31,9 @@ final readonly class BookingService
      */
     public function create(CreateBookingDTO $dto): HuntingBooking
     {
-        return DB::transaction(function () use ($dto) {
+        $conn = $this->db->connection();
+
+        return $conn->transaction(function () use ($dto): HuntingBooking {
             /** @var Guide|null $guide */
             $guide = $this->guideRepository->getById($dto->guideId);
 
