@@ -38,7 +38,10 @@ final class GuidesIndexController extends Controller
      */
     public function __invoke(ListGuidesRequest $request): AnonymousResourceCollection
     {
-        $minExperience = (int)$request->input('min_experience');
+        $minExperience = $request->filled('min_experience')
+            ? (int)$request->input('min_experience')
+            : null;
+
         $list = $this->guides->listActive($minExperience);
 
         return GuideResource::collection($list->all());
