@@ -23,7 +23,7 @@ final readonly class CreateBookingDTO
     }
 
     /**
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public static function fromArray(array $data): self
     {

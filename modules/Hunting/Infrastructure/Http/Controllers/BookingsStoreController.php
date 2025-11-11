@@ -7,6 +7,7 @@ namespace Modules\Hunting\Infrastructure\Http\Controllers;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use InvalidArgumentException;
 use Modules\Hunting\Application\DTO\CreateBookingDTO;
 use Modules\Hunting\Application\Services\BookingService;
 use Modules\Hunting\Infrastructure\Http\Requests\CreateBookingRequest;
@@ -27,6 +28,8 @@ final class BookingsStoreController extends Controller
             return (new BookingResource($created))
                 ->response()
                 ->setStatusCode(201);
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 409);
         }
