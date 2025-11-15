@@ -1,4 +1,4 @@
-# Hunting Module for BookingCore (Laravel 12)
+# Hunting Booking Module (Laravel 12)
 
 ## Задание
 
@@ -31,7 +31,7 @@
 
 * Добавить простейший Unit/Feature-тест.
 * Сделать фильтр `GET /api/guides?min_experience=3`.
-* Коротко описать в README, как встроить модуль в BookingCore.
+* Коротко описать в README.
 
 ---
 
@@ -39,15 +39,14 @@
 
 Модуль Hunting создан в виде отдельного пакета `modules/Hunting`, подключаемого через `ModulesServiceProvider` 
 на базе чистого Laravel 12.
-Модуль построен по принципу feature-first и придерживается подхода лайтового DDD, то есть выделены основные 
-слои (Domain, Application, Infrastructure), но без излишней бюрократии и оверхеда. Это осознанное 
-решение: для тестового задания и небольшого проекта полный DDD был бы просто чрезмерным.
+Модуль построен по принципу feature-first и придерживается подхода лайтового DDD, то есть выделены основные
+слои (Domain, Application, Infrastructure), но без излишней бюрократии и оверхеда.
 
 Для удобства всё сразу готово под запуск в Laravel Sail с базой SQLite.
 
 ---
 
-## Запуск с Laravel Sail
+## Запуск
 
 ```bash
 composer install
@@ -57,26 +56,12 @@ touch database/database.sqlite
 ./vendor/bin/sail artisan db:seed --class=Modules\\Hunting\\Infrastructure\\Database\\Seeders\\GuidesSeeder
 ```
 
----
+## Тесты:
+```bash
+./vendor/bin/sail a test --filter=HuntingApiTest
+```
 
-## Встраивание модуля в BookingCore
-
-1. Скопировать каталог `modules/Hunting` в корень проекта.
-2. В `composer.json` добавить namespace в секции `psr-4`:
-
-   ```json
-   "Modules\\": "modules/"
-   ```
-
-   Выполнить:
-
-   ```bash
-   composer dump-autoload
-   ```
-3. Зарегистрировать провайдер `Modules\Hunting\HuntingServiceProvider`.
-4. Применить миграции и запустить сидер:
-
-   ```bash
-   php artisan migrate
-   php artisan db:seed --class=Modules\\Hunting\\Infrastructure\\Database\\Seeders\\GuidesSeeder
-   ```
+## Документация API:
+```
+http://127.0.0.1/api/documentation
+```
